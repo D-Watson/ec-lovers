@@ -1,11 +1,10 @@
+import models
 from sqlalchemy.orm import Session
-from datas import user_lover_entity as models
-from datas import user_lover_schemas as schemas
 
 
 # 创建
-def create_user_lover(db: Session, lover: schemas.UserLoverCreate):
-    db_lover = models.UserLover(**lover.model_dump())
+def create_user_lover(db: Session, lover: models.UserLoverCreate):
+    db_lover = models.UserLoverDB(**lover.model_dump())
     db.add(db_lover)
     db.commit()
     db.refresh(db_lover)
@@ -14,21 +13,21 @@ def create_user_lover(db: Session, lover: schemas.UserLoverCreate):
 
 # 读取（单个）
 def get_user_lover(db: Session, user_id: str, lover_id: str):
-    return db.query(models.UserLover).filter(
-        models.UserLover.user_id == user_id,
-        models.UserLover.lover_id == lover_id
+    return db.query(models.UserLoverDB).filter(
+        models.UserLoverDB.user_id == user_id,
+        models.UserLoverDB.lover_id == lover_id
     ).first()
 
 
 # 读取（用户所有恋人）
 def get_user_lovers(db: Session, user_id: str):
-    return db.query(models.UserLover).filter(
-        models.UserLover.user_id == user_id
+    return db.query(models.UserLoverDB).filter(
+        models.UserLoverDB.user_id == user_id
     ).all()
 
 
 # 更新
-def update_user_lover(db: Session, user_id: str, lover_id: str, lover_update: schemas.UserLoverCreate):
+def update_user_lover(db: Session,user_id: str, lover_id: str, lover_update: models.UserLoverCreate):
     db_lover = get_user_lover(db, user_id, lover_id)
     if not db_lover:
         return None
@@ -42,8 +41,8 @@ def update_user_lover(db: Session, user_id: str, lover_id: str, lover_update: sc
 
 
 # 删除
-def delete_user_lover(db: Session, user_id: str, lover_id: str):
-    db_lover = get_user_lover(db, user_id, lover_id)
+def delete_user_lover(db: Session,user_id: str, lover_id: str):
+    db_lover = get_user_lover(db,user_id, lover_id)
     if not db_lover:
         return False
 

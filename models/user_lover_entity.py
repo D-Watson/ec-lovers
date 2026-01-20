@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-class UserLover(Base):
+class UserLoverDB(Base):
     __tablename__ = "user_lovers"
 
     id = Column(Integer, primary_key=True, index=True)
