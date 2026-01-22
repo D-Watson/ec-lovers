@@ -20,10 +20,10 @@ def create_lover(lover: models.UserLoverCreate, db: Session = Depends(get_db)):
     entity = services.lover_add(db, lover)
     if entity is None or entity.id < 0:
         return models.BaseResponse(
-            code=500,
-            msg='db error'
+            code=consts.ErrorCode.DB_ERR[0],
+            msg=consts.ErrorCode.DB_ERR[1]
         )
-    return models.BaseResponse(code=200, msg='success', data=entity)
+    return models.SuccessResponse.build(data=entity)
 
 
 @router.get("/list", response_model=models.BaseResponse[List[models.UserLover]])
