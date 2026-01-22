@@ -25,3 +25,4 @@ class UserLover(UserLoverBase):
     class Config:
         from_attributes = True
 
+

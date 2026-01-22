@@ -4,10 +4,21 @@ from datetime import datetime
 
 from typing import TypeVar, Generic
 
+import consts
+
 T = TypeVar('T')
 
 
-class BaseResponse(BaseModel,Generic[T]):
+class SuccessResponse(BaseModel, Generic[T]):
+    code: int
+    msg: str
+    data: Optional[T] = None
+    @classmethod
+    def build(cls, data: Optional[T] = None):
+        return cls(code=consts.ErrorCode.SUCCESS[0], msg=consts.ErrorCode.SUCCESS[1], data=data)
+
+
+class BaseResponse(BaseModel, Generic[T]):
     code: int
     msg: str
     data: Optional[T] = None

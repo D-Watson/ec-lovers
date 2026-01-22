@@ -1,3 +1,5 @@
+from typing import List
+
 import models
 from sqlalchemy.orm import Session
 
@@ -20,7 +22,7 @@ def get_user_lover(db: Session, user_id: str, lover_id: str):
 
 
 # 读取（用户所有恋人）
-def get_user_lovers(db: Session, user_id: str):
+def get_user_lovers(db: Session, user_id: str) -> List[models.UserLoverDB]:
     return db.query(models.UserLoverDB).filter(
         models.UserLoverDB.user_id == user_id
     ).all()

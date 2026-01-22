@@ -1,7 +1,7 @@
 import logging
 
 from sqlalchemy.orm import Session
-
+import consts
 import models
 import mapper
 
@@ -9,20 +9,20 @@ import mapper
 def lover_add(db: Session, lover: models.UserLoverCreate):
     try:
         entity = mapper.create_user_lover(db, lover)
-        userLover = models.UserLover(
-            id=entity.id,
-            lover_id=entity.lover_id,
-            user_id=entity.user_id,
-            avatar=entity.avatar,
-            name=entity.name,
-            gender=entity.gender,
-            personality=entity.personality,
-            hobbies=entity.hobbies,
-            talking_style=entity.talking_style,
-            created_at=entity.created_at,
-            updated_at=entity.updated_at
-        )
+        userLover = entity.toUserLover()
         return userLover
     except Exception as e:
         logging.error(f"Database integrity error: {e}")
         return None
+
+
+def lover_list(db: Session, user_id: str):
+    res = []
+    try:
+        list = mapper.get_user_lovers(db, user_id)
+        for item in list:
+            res.append(item.toUserLover())
+    except Exception as e:
+        logging.error(f"Db query list error: {e}")
+        raise consts.ServiceError(code=consts.ErrorCode.DB_ERR)
+    return res

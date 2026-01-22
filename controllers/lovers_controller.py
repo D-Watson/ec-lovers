@@ -1,10 +1,12 @@
 import logging
+from typing import List
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 import models
 import services
 from db import get_db
+import consts
 
 router = APIRouter(
     prefix="/lovers",  # 所有路由自动加前缀 /lovers
@@ -22,3 +24,20 @@ def create_lover(lover: models.UserLoverCreate, db: Session = Depends(get_db)):
             msg='db error'
         )
     return models.BaseResponse(code=200, msg='success', data=entity)
+
+
+@router.get("/list", response_model=models.BaseResponse[List[models.UserLover]])
+def list_lovers(user_id: str, db: Session = Depends(get_db)):
+    logging.info(f"request userId={user_id}")
+    try:
+        list = services.lover_list(db, user_id)
+    except consts.ServiceError as se:
+        logging.error(f"service error code={se.err_code}, msg={se.err_msg}")
+        return models.BaseResponse(
+            code=se.err_code,
+            msg=se.err_msg,
+            data=[]
+        )
+    return models.SuccessResponse.build(
+        data=list
+    )
