@@ -1,11 +1,12 @@
 from typing import List
 
 import models
-from sqlalchemy.orm import Session
+import db
 
+db = next(db.get_main_db())
 
 # 创建
-def create_user_lover(db: Session, lover: models.UserLoverCreate):
+def create_user_lover(lover: models.UserLoverCreate):
     db_lover = models.UserLoverDB(**lover.model_dump())
     db.add(db_lover)
     db.commit()
@@ -14,7 +15,7 @@ def create_user_lover(db: Session, lover: models.UserLoverCreate):
 
 
 # 读取（单个）
-def get_user_lover(db: Session, user_id: str, lover_id: str):
+def get_user_lover(user_id: str, lover_id: str):
     return db.query(models.UserLoverDB).filter(
         models.UserLoverDB.user_id == user_id,
         models.UserLoverDB.lover_id == lover_id
@@ -22,14 +23,14 @@ def get_user_lover(db: Session, user_id: str, lover_id: str):
 
 
 # 读取（用户所有恋人）
-def get_user_lovers(db: Session, user_id: str) -> List[models.UserLoverDB]:
+def get_user_lovers(user_id: str) -> List[models.UserLoverDB]:
     return db.query(models.UserLoverDB).filter(
         models.UserLoverDB.user_id == user_id
     ).all()
 
 
 # 更新
-def update_user_lover(db: Session,user_id: str, lover_id: str, lover_update: models.UserLoverCreate):
+def update_user_lover(user_id: str, lover_id: str, lover_update: models.UserLoverCreate):
     db_lover = get_user_lover(db, user_id, lover_id)
     if not db_lover:
         return None
@@ -43,7 +44,7 @@ def update_user_lover(db: Session,user_id: str, lover_id: str, lover_update: mod
 
 
 # 删除
-def delete_user_lover(db: Session,user_id: str, lover_id: str):
+def delete_user_lover(user_id: str, lover_id: str):
     db_lover = get_user_lover(db,user_id, lover_id)
     if not db_lover:
         return False
