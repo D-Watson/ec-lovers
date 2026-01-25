@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 import models
 import services
-from db import get_db
+from db import get_main_db
 import consts
 
 router = APIRouter(
@@ -15,7 +15,7 @@ router = APIRouter(
 
 
 @router.post("/create", response_model=models.BaseResponse[models.UserLover])
-def create_lover(lover: models.UserLoverCreate, db: Session = Depends(get_db)):
+def create_lover(lover: models.UserLoverCreate, db: Session = Depends(get_main_db)):
     logging.info(f"request={lover}")
     entity = services.lover_add(db, lover)
     if entity is None or entity.id < 0:
@@ -27,7 +27,7 @@ def create_lover(lover: models.UserLoverCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/list", response_model=models.BaseResponse[List[models.UserLover]])
-def list_lovers(user_id: str, db: Session = Depends(get_db)):
+def list_lovers(user_id: str, db: Session = Depends(get_main_db)):
     logging.info(f"request userId={user_id}")
     try:
         list = services.lover_list(db, user_id)

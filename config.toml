@@ -1,0 +1,11 @@
+[database.bot]
+pool_size = 10
+max_overflow = 20
+
+[database.message]
+pool_size = 20
+max_overflow = 30
+
+[database.biz]
+pool_size = 20
+max_overflow = 50
