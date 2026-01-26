@@ -1,3 +1,5 @@
+
+
 class ErrorCode:
     SUCCESS = (200, "success")
     DB_ERR = (2001, "db error")
@@ -25,3 +27,4 @@ class ServiceError(Exception):
 
     def __str__(self):
         return f"Error Code: {self.err_code}, Message: {self.err_msg}"
+

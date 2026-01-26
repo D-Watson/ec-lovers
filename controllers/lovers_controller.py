@@ -1,12 +1,10 @@
 import logging
 from typing import List
 
-from fastapi import APIRouter, Depends,WebSocket
-from sqlalchemy.orm import Session
+from fastapi import APIRouter,WebSocket
 
 import models
 import services
-from db import get_main_db
 import consts
 
 router = APIRouter(
@@ -24,6 +22,7 @@ def create_lover(lover: models.UserLoverCreate):
             code=consts.ErrorCode.DB_ERR[0],
             msg=consts.ErrorCode.DB_ERR[1]
         )
+    bot_prompt = services.save_prompt(entity)
     return models.SuccessResponse.build(data=entity)
 
 
