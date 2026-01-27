@@ -44,5 +44,6 @@ def list_lovers(user_id: str):
 
 
 @router.websocket("/chat/{user_id}/{lover_id}")
-async def lover_chat(websocket: WebSocket,user_id: str, lover_id: str):
+async def lover_chat(websocket: WebSocket, user_id: str, lover_id: str):
+    print(websocket)
     await services.chat(websocket, user_id, lover_id)

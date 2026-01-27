@@ -17,6 +17,8 @@ app.add_middleware(
     allow_methods=["*"],  # 允许所有方法（GET, POST, OPTIONS 等）
     allow_headers=["*"],  # 允许所有 headers
 )
+
+
 @app.get("/")
 def root():
     return {"message": "Welcome to Love API!"}

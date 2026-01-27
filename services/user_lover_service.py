@@ -6,9 +6,6 @@ import models
 import mapper
 
 
-
-
-
 def lover_add(lover: models.UserLoverCreate):
     try:
         entity = mapper.create_user_lover(lover)
@@ -29,7 +26,3 @@ def lover_list(user_id: str):
         logging.error(f"Db query list error: {e}")
         raise consts.ServiceError(code=consts.ErrorCode.DB_ERR)
     return res
-
-
-
-

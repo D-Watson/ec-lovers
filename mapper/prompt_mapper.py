@@ -1,8 +1,3 @@
-from typing import List
-
-import models
-from sqlalchemy.orm import Session
-
 from models.schemas import BotPrompt
 import db
 
@@ -30,7 +25,8 @@ def create_bot_prompt(bot_id: str, prompt_text: str, version: int = 1,
 # 获取某个 bot 的当前活跃 prompt
 def get_active_prompt(bot_id: str) -> BotPrompt | None:
     try:
-        return session.query(BotPrompt).filter_by(bot_id=bot_id, is_active=True).first()
+        bot_prompt = session.query(BotPrompt).filter_by(bot_id=bot_id).first()
+        return bot_prompt
     finally:
         session.close()
 

@@ -1,7 +1,5 @@
 # settings.py
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import PostgresDsn
-from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -43,7 +41,7 @@ class Settings(BaseSettings):
 
     @property
     def msg_database_url(self) -> str:
-        return f"postgresql://{self.msg_db_user}:{self.msg_db_password}@{self.msg_db_host}:{self.msg_db_port}/{self.msg_db_name}"
+        return f"postgresql+asyncpg://{self.msg_db_user}:{self.msg_db_password}@{self.msg_db_host}:{self.msg_db_port}/{self.msg_db_name}"
 
 
 # 创建单例实例
