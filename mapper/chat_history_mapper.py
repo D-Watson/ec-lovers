@@ -9,14 +9,13 @@ import db
 from models.schemas.message_store import MessageStore  # 你的 ORM 模型
 
 
-AsyncSessionLocal = db.get_msg_session()
-
 class PostgresChatMessageHistoryAsync(BaseChatMessageHistory):
 
     def __init__(self, session_id: str):
         self.session_id = session_id
 
     async def aget_messages(self) -> List[BaseMessage]:
+        AsyncSessionLocal = db.get_msg_session()
         """异步获取消息"""
         try:
             async with AsyncSessionLocal() as session:
@@ -49,6 +48,7 @@ class PostgresChatMessageHistoryAsync(BaseChatMessageHistory):
 
 async def save_messages(session_id: str, messages: Sequence[BaseMessage]) -> None:
     """异步添加消息"""
+    AsyncSessionLocal = db.get_msg_session()
     try:
         async with AsyncSessionLocal() as session:
             async with session.begin():  # 开启事务

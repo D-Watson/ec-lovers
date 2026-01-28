@@ -21,7 +21,7 @@ class MessageStore(Base):
     # 在模型中也可以定义 CHECK 约束（可选，表已通过 SQL 定义）
     __table_args__ = (
         CheckConstraint(
-            type.in_(['human', 'ai', 'system', 'tool', 'function']),
+            "type IN ('human', 'ai', 'system', 'tool', 'function')",
             name='valid_message_type'
         ),
     )

@@ -46,11 +46,8 @@ async def heartbeat(ws: WebSocket):
 
 
 async def chat(ws: WebSocket, user_id: str, bot_id: str):
-    if len(user_id) == 0 or len(bot_id) == 0:
-        return
     try:
         record = mapper.get_user_lover(user_id=user_id, lover_id=bot_id)
-        print(record)
         logging.info(f"find lover info success {record}")
     except Exception as e:
         logging.error(f"[db] query error, userId={user_id}, lover_id={bot_id}, e={e}")
@@ -71,24 +68,24 @@ async def chat(ws: WebSocket, user_id: str, bot_id: str):
                 logging.info(f'message={msg}')
                 if msg["type"] == "websocket.disconnect":
                     break
+                if msg["type"] == "websocket.close":
+                    logging.info("ws close.")
+                    break
                 user_text = msg.get("text", "")
                 print(user_text)
                 if not user_text.strip():
                     continue
-                print("xxxx")
                 # === 关键修改：遍历异步生成器 ===
                 async for chunk in generate_and_save(bot_id=bot_id, query=user_text, session_id=session_id):
                     await ws.send_text(chunk)  # 流式发送每个 chunk
-
             except asyncio.TimeoutError:
                 logging.error(f"Client timeout, closing connection")
                 break
     except Exception as e:
         logging.error(f"[ws] connect error={e}")
         return
-    finally:
-        # task.cancel()
-        await ws.close()
+    # finally:
+    # task.cancel()
 
 
 def get_prompt(bot_id: str):
@@ -113,7 +110,6 @@ def get_session_history(session_id: str) -> PostgresChatMessageHistoryAsync:
 
 async def generate_and_save(bot_id: str, query: str, session_id: str):
     prompt = get_prompt(bot_id)
-    print(prompt)
     chain = prompt | model
     with_message_history = RunnableWithMessageHistory(
         chain,
@@ -135,4 +131,3 @@ async def generate_and_save(bot_id: str, query: str, session_id: str):
         session_id=session_id,
         messages=[HumanMessage(content=query), AIMessage(content=full_response)]
     )
-
