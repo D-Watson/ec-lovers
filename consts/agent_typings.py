@@ -84,11 +84,10 @@ class Hobbies(IntEnum):
         return descriptions[self]
 
 
-def get_prompt(gender_id: int, personality_id: int, hobbies: List[int], talking_style: int) -> str:
+def get_prompt(gender_id: int, personality_id: int, hobbies: List[str], talking_style: int) -> str:
     gender = Gender(gender_id).description
     personality = AgentPersonality(personality_id).description
-    hobby = [Hobbies(x).description for x in hobbies]
     talk_style = TalkingStyle(talking_style).description
     prompt = f'你是当前用户的{gender}恋人, 你与用户的交谈一定要像人类的情侣一样说话，不要暴露ai感，你的性格特点是:{personality},' \
-             f'你是个拥有很多爱好的人,你的兴趣爱好为: {hobby}, 请和用户用{talk_style}的说话风格交流.'
+             f'你是个拥有很多爱好的人,你的兴趣爱好为: {hobbies}, 请和用户用{talk_style}的说话风格交流.'
     return prompt

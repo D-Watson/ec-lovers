@@ -6,7 +6,7 @@ CREATE TABLE user_lovers (
     lover_id TEXT NOT NULL,
 
     avatar TEXT ,
-    name TEXT NOT NULL CHECK (LENGTH(name) > 0 AND LENGTH(name) <= 50),
+    name varchar(255) NOT NULL,
 
     gender SMALLINT NOT NULL CHECK (gender IN (0, 1)),
     personality SMALLINT NOT NULL,

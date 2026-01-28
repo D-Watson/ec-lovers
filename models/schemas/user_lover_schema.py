@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, Text, SmallInteger, ARRAY, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
 import models
+from consts import Hobbies
+
 Base = declarative_base()
 
 
@@ -21,6 +23,7 @@ class UserLoverDB(Base):
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     def toUserLover(self):
+        hobbies = [Hobbies(x).description for x in self.hobbies]
         return models.UserLover(
             id=self.id,
             lover_id=self.lover_id,
@@ -29,7 +32,7 @@ class UserLoverDB(Base):
             name=self.name,
             gender=self.gender,
             personality=self.personality,
-            hobbies=self.hobbies,
+            hobbies=hobbies,
             talking_style=self.talking_style,
             created_at=self.created_at,
             updated_at=self.updated_at
