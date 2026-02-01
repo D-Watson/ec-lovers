@@ -76,8 +76,11 @@ async def chat(ws: WebSocket, user_id: str, bot_id: str):
                 if not user_text.strip():
                     continue
                 # === 关键修改：遍历异步生成器 ===
-                async for chunk in generate_and_save(bot_id=bot_id, query=user_text, session_id=session_id):
-                    await ws.send_text(chunk)  # 流式发送每个 chunk
+                full_response = await generate_and_save(bot_id=bot_id, query=user_text, session_id=session_id)
+                print(full_response)
+                await ws.send_text(full_response)
+                # async for chunk in generate_and_save(bot_id=bot_id, query=user_text, session_id=session_id):
+                #     await ws.send_text(chunk)  # 流式发送每个 chunk
             except asyncio.TimeoutError:
                 logging.error(f"Client timeout, closing connection")
                 break
@@ -108,7 +111,7 @@ def get_session_history(session_id: str) -> PostgresChatMessageHistoryAsync:
     return PostgresChatMessageHistoryAsync(session_id=session_id)
 
 
-async def generate_and_save(bot_id: str, query: str, session_id: str):
+async def generate_and_save(bot_id: str, query: str, session_id: str)->str:
     prompt = get_prompt(bot_id)
     chain = prompt | model
     with_message_history = RunnableWithMessageHistory(
@@ -117,17 +120,24 @@ async def generate_and_save(bot_id: str, query: str, session_id: str):
         input_messages_key="messages"
     )
     config = {"configurable": {"session_id": session_id}}
-    full_response = ""
-    async for chunk in with_message_history.astream(
-            {"messages": [HumanMessage(content=query)]},
-            config=config
-    ):
-        content = chunk.content if hasattr(chunk, 'content') else str(chunk)
-        full_response += content
-        yield content
+    chunks = await with_message_history.ainvoke(
+        {"messages": [HumanMessage(content=query)]},
+        config=config
+    )
+    print(chunks)
+    full_response = chunks.content if hasattr(chunks, 'content') else str(chunks)
+    # async for chunk in with_message_history.astream(
+    #         {"messages": [HumanMessage(content=query)]},
+    #         config=config
+    # ):
+    #     content = chunk.content if hasattr(chunk, 'content') else str(chunk)
+    #     full_response += content
+    #     yield content
     logging.info(f'full response={full_response}')
     # 保存历史记录
     await save_messages(
         session_id=session_id,
         messages=[HumanMessage(content=query), AIMessage(content=full_response)]
     )
+    return full_response
+

@@ -1,3 +1,5 @@
+from starlette.requests import Request
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from controllers import lovers_controller
@@ -24,5 +26,11 @@ def root():
     return {"message": "Welcome to Love API!"}
 
 
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    print("Incoming request:", request.url)
+    return await call_next(request)
+
+
 if __name__ == '__main__':
-    uvicorn.run(app, host='localhost', port=8080)
+    uvicorn.run(app, host='0.0.0.0', port=8080)
