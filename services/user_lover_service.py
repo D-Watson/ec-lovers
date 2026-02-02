@@ -26,3 +26,30 @@ def lover_list(user_id: str):
         logging.error(f"Db query list error: {e}")
         raise consts.ServiceError(code=consts.ErrorCode.DB_ERR)
     return res
+
+
+def save_prompt(lover: models.UserLover):
+    prompt = consts.get_prompt(gender_id=lover.gender,
+                               personality_id=lover.gender,
+                               hobbies=lover.hobbies,
+                               talking_style=lover.talking_style)
+    try:
+        botPrompt = mapper.create_bot_prompt(
+            bot_id=lover.lover_id,
+            prompt_text=prompt,
+            version=1
+        )
+        logging.info(f'botPrompt info = {botPrompt}')
+    except Exception as e:
+        logging.error(f'[db]save prompt error={e}')
+        raise consts.ServiceError(consts.ErrorCode.DB_ERR)
+
+
+def delete_lover(user_id: str, lover_id: str):
+    try:
+        if mapper.delete_user_lover(user_id, lover_id):
+            return True
+    except Exception as e:
+        logging.error(f'delete lover error={e}')
+        raise consts.ServiceError(consts.ErrorCode.DB_ERR)
+    return False

@@ -2,7 +2,14 @@
 
 class ErrorCode:
     SUCCESS = (200, "success")
+    PARAM_ERR = (2000, "param error")
     DB_ERR = (2001, "db error")
+
+    COS_UPLOAD_ERR = (2002, "tencent cos upload file error.")
+    COS_DOWNLOAD_ERR = (2003, "tencent cos download error.")
+
+    #huggingface error
+    HUGGING_GENERATE_ERR = (2004, "hugging face generate error.")
 
     @classmethod
     def get_message(cls, code: int) -> str:

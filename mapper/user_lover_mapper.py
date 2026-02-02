@@ -1,9 +1,12 @@
+import logging
 from typing import List
 
+import consts
 import models
 import db
 
 db = next(db.get_main_db())
+
 
 # 创建
 def create_user_lover(lover: models.UserLoverCreate):
@@ -31,24 +34,27 @@ def get_user_lovers(user_id: str) -> List[models.UserLoverDB]:
 
 # 更新
 def update_user_lover(user_id: str, lover_id: str, lover_update: models.UserLoverCreate):
-    db_lover = get_user_lover(db, user_id, lover_id)
-    if not db_lover:
-        return None
+    try:
+        db_lover = get_user_lover(user_id, lover_id)
+        if not db_lover:
+            return None
 
-    for key, value in lover_update.model_dump().items():
-        setattr(db_lover, key, value)
+        for key, value in lover_update.model_dump().items():
+            setattr(db_lover, key, value)
 
-    db.commit()
-    db.refresh(db_lover)
+        db.commit()
+        db.refresh(db_lover)
+    except Exception as e:
+        logging.error(f'update lover={lover_id} error={e}')
+        raise consts.ServiceError(consts.ErrorCode.DB_ERR)
     return db_lover
 
 
 # 删除
-def delete_user_lover(user_id: str, lover_id: str):
-    db_lover = get_user_lover(db,user_id, lover_id)
+def delete_user_lover(user_id: str, lover_id: str) -> bool:
+    db_lover = get_user_lover(user_id, lover_id)
     if not db_lover:
         return False
-
     db.delete(db_lover)
     db.commit()
     return True

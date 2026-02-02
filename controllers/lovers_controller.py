@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from fastapi import APIRouter,WebSocket
+from fastapi import APIRouter, WebSocket, Path, Query, Form
 
 import models
 import services
@@ -22,12 +22,20 @@ def create_lover(lover: models.UserLoverCreate):
             code=consts.ErrorCode.DB_ERR[0],
             msg=consts.ErrorCode.DB_ERR[1]
         )
-    bot_prompt = services.save_prompt(entity)
+    try:
+        services.save_prompt(entity)
+    except consts.ServiceError as e:
+        return models.BaseResponse(
+            code=e.err_code,
+            msg=e.err_msg
+        )
     return models.SuccessResponse.build(data=entity)
 
 
 @router.get("/list", response_model=models.BaseResponse[List[models.UserLover]])
-def list_lovers(user_id: str):
+def list_lovers(
+        user_id: str = Query(..., min_length=1, max_length=20)
+):
     logging.info(f"request userId={user_id}")
     try:
         list = services.lover_list(user_id)
@@ -44,7 +52,26 @@ def list_lovers(user_id: str):
 
 
 @router.websocket("/chat/{user_id}/{lover_id}")
-async def lover_chat(websocket: WebSocket, user_id: str, lover_id: str):
-    if len(user_id) == 0 or len(lover_id) == 0:
-        return
-    await services.chat(websocket, user_id, lover_id)
+async def lover_chat(websocket: WebSocket,
+                     user_id: str = Path(..., min_length=1, max_length=20),
+                     lover_id: str = Path(..., pattern=r"^lover-\d+$")
+                     ):
+    server = services.AIServer(user_id=user_id, lover_id=lover_id)
+    await server.chat(websocket)
+
+
+@router.post("/delete")
+def lover_delete(
+        user_id: str = Form(..., min_length=1, max_length=20),
+        lover_id: str = Form(..., pattern=r"^lover-\d+$")
+):
+    try:
+        if services.delete_lover(lover_id=lover_id, user_id=user_id):
+            return models.SuccessResponse()
+    except consts.ServiceError as e:
+        return models.BaseResponse(
+            code=e.err_code,
+            msg=e.err_msg
+        )
+
+

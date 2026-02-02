@@ -27,3 +27,15 @@ class UserLover(UserLoverBase):
 
     class Config:
         from_attributes = True
+
+
+class LoverAvatarRequest(BaseModel):
+    user_id: str
+    lover_id: str
+    prompt: str
+
+
+class LoverAvatarRes(BaseModel):
+    user_id: str
+    lover_id: str
+    avatar: str

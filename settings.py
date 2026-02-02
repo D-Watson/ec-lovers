@@ -1,6 +1,9 @@
 # settings.py
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
+from qcloud_cos import CosConfig
+from qcloud_cos import CosS3Client
+import sys
+import logging
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -43,6 +46,21 @@ class Settings(BaseSettings):
     def msg_database_url(self) -> str:
         return f"postgresql+asyncpg://{self.msg_db_user}:{self.msg_db_password}@{self.msg_db_host}:{self.msg_db_port}/{self.msg_db_name}"
 
+    COS_SK: str
+    COS_ID: str
 
-# 创建单例实例
+    @property
+    def get_cos_client(self) -> CosS3Client:
+        logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+        secret_id = self.COS_ID
+        secret_key = self.COS_SK
+        region = 'ap-guangzhou'
+        token = None
+        scheme = 'https'
+        config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key, Token=token, Scheme=scheme)
+        client = CosS3Client(config)
+        return client
+
+
+        # 创建单例实例
 settings = Settings()
