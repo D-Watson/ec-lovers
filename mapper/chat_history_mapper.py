@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 import db
 from models.schemas.message_store import MessageStore  # 你的 ORM 模型
-
+from consts import ServiceError, ErrorCode
 
 class PostgresChatMessageHistoryAsync(BaseChatMessageHistory):
 
@@ -63,3 +63,20 @@ async def save_messages(session_id: str, messages: Sequence[BaseMessage]) -> Non
     except Exception as e:
         logging.error(f'error={e}')
         return
+
+
+async def get_messages(session_id: str) -> List[MessageStore]:
+    AsyncSessionLocal = db.get_msg_session()
+    try:
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(
+                select(MessageStore).
+                where(MessageStore.session_id == session_id).
+                order_by(MessageStore.created_at)
+            )
+            records = result.scalars().all()
+            print(records[0])
+            return records
+    except Exception as e:
+        logging.error(f'[db] get msg error, session={session_id}, e={e}')
+        raise ServiceError(ErrorCode.DB_ERR)

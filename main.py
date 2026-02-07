@@ -2,7 +2,7 @@ from starlette.requests import Request
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from controllers import lovers_controller
+import controllers
 import uvicorn
 
 app = FastAPI(
@@ -10,7 +10,8 @@ app = FastAPI(
     description="情侣互动 API",
     version="1.0.0"
 )
-app.include_router(lovers_controller.router)
+app.include_router(controllers.router)
+app.include_router(controllers.photo)
 # 添加 CORS 中间件
 app.add_middleware(
     CORSMiddleware,

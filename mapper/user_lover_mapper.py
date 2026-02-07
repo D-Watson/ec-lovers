@@ -33,15 +33,12 @@ def get_user_lovers(user_id: str) -> List[models.UserLoverDB]:
 
 
 # 更新
-def update_user_lover(user_id: str, lover_id: str, lover_update: models.UserLoverCreate):
+def update_user_lover_avatar(user_id: str, lover_id: str, avatar: str):
     try:
         db_lover = get_user_lover(user_id, lover_id)
         if not db_lover:
             return None
-
-        for key, value in lover_update.model_dump().items():
-            setattr(db_lover, key, value)
-
+        db_lover.avatar = avatar
         db.commit()
         db.refresh(db_lover)
     except Exception as e:

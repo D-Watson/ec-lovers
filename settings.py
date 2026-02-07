@@ -1,9 +1,12 @@
 # settings.py
+from typing import List
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from qcloud_cos import CosConfig
 from qcloud_cos import CosS3Client
 import sys
 import logging
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -61,6 +64,22 @@ class Settings(BaseSettings):
         client = CosS3Client(config)
         return client
 
+    HUGGINGFACE_HUB: str
 
+    @property
+    def get_huggingface_conf(self) -> str:
+        hugging = self.HUGGINGFACE_HUB
+        return hugging
         # 创建单例实例
+
+    ARK_API_KEY: str
+    ARK_API_URL: str
+
+    @property
+    def get_doubao_conf(self) -> List:
+        ARK_API_KEY = self.ARK_API_KEY
+        ARK_API_URL = self.ARK_API_URL
+        return [ARK_API_KEY, ARK_API_URL]
+
+
 settings = Settings()

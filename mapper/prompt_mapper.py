@@ -89,9 +89,13 @@ def activate_prompt_version(prompt_id: int) -> bool:
         session.close()
 
 
-def delete_prompt(prompt_id: int) -> bool:
+def delete_prompt(bot_id: str) -> bool:
     try:
-        prompt = session.get(BotPrompt, prompt_id)
+        prompt = session.query(
+            BotPrompt
+        ).filter(
+            BotPrompt.bot_id == bot_id
+        )
         if not prompt:
             return False
         session.delete(prompt)

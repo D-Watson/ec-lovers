@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Any
 from datetime import datetime
 
 
@@ -29,6 +29,11 @@ class UserLover(UserLoverBase):
         from_attributes = True
 
 
+class LoverRequestBase(BaseModel):
+    user_id: str
+    lover_id: str
+
+
 class LoverAvatarRequest(BaseModel):
     user_id: str
     lover_id: str
@@ -39,3 +44,11 @@ class LoverAvatarRes(BaseModel):
     user_id: str
     lover_id: str
     avatar: str
+
+
+class MessageEntity(BaseModel):
+    id: int
+    sender: str
+    content: str
+    timestamp: datetime
+    type: str

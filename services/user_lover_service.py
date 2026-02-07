@@ -47,8 +47,9 @@ def save_prompt(lover: models.UserLover):
 
 def delete_lover(user_id: str, lover_id: str):
     try:
-        if mapper.delete_user_lover(user_id, lover_id):
-            return True
+        mapper.delete_user_lover(user_id, lover_id)
+        mapper.delete_prompt(lover_id)
+
     except Exception as e:
         logging.error(f'delete lover error={e}')
         raise consts.ServiceError(consts.ErrorCode.DB_ERR)

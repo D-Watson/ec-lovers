@@ -8,8 +8,9 @@ class ErrorCode:
     COS_UPLOAD_ERR = (2002, "tencent cos upload file error.")
     COS_DOWNLOAD_ERR = (2003, "tencent cos download error.")
 
-    #huggingface error
-    HUGGING_GENERATE_ERR = (2004, "hugging face generate error.")
+    #image generate error
+    IMAGE_GENERATE_ERR = (2004, "doubao image generate error.")
+
 
     @classmethod
     def get_message(cls, code: int) -> str:

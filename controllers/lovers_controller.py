@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from fastapi import APIRouter, WebSocket, Path, Query, Form
+from fastapi import APIRouter, WebSocket, Path, Query
 
 import models
 import services
@@ -61,12 +61,10 @@ async def lover_chat(websocket: WebSocket,
 
 
 @router.post("/delete")
-def lover_delete(
-        user_id: str = Form(..., min_length=1, max_length=20),
-        lover_id: str = Form(..., pattern=r"^lover-\d+$")
-):
+def lover_delete(lover: models.LoverRequestBase):
+    print(lover)
     try:
-        if services.delete_lover(lover_id=lover_id, user_id=user_id):
+        if services.delete_lover(lover_id=lover.lover_id, user_id=lover.user_id):
             return models.SuccessResponse()
     except consts.ServiceError as e:
         return models.BaseResponse(
@@ -75,3 +73,13 @@ def lover_delete(
         )
 
 
+@router.get("/history")
+async def get_messages(user_id: str, lover_id: str):
+    try:
+        res = await services.get_messages(user_id, lover_id)
+        return models.SuccessResponse.build(data=res)
+    except consts.ServiceError as e:
+        return models.BaseResponse(
+            code=e.err_code,
+            msg=e.err_msg
+        )
