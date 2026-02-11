@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import controllers
 import uvicorn
-from middlewares import PrometheusMiddleware
+from middlewares import PrometheusMiddleware, AuthMiddleware
 from starlette.responses import Response
 
 app = FastAPI(
@@ -24,6 +24,8 @@ app.add_middleware(
     allow_headers=["*"],  # 允许所有 headers
 )
 app.add_middleware(PrometheusMiddleware)
+app.add_middleware(AuthMiddleware)
+
 
 @app.get("/")
 def root():
@@ -34,6 +36,7 @@ def root():
 def metrics():
     """暴露 Prometheus 指标"""
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):

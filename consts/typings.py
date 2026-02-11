@@ -5,11 +5,14 @@ class ErrorCode:
     PARAM_ERR = (2000, "param error")
     DB_ERR = (2001, "db error")
 
+    REDIS_KEY_NOT_EXISTS = (2005, "[redis] key not exists.")
+
     COS_UPLOAD_ERR = (2002, "tencent cos upload file error.")
     COS_DOWNLOAD_ERR = (2003, "tencent cos download error.")
 
     #image generate error
     IMAGE_GENERATE_ERR = (2004, "doubao image generate error.")
+
 
 
     @classmethod

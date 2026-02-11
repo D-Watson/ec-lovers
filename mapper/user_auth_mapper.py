@@ -1,21 +1,11 @@
 # crud.py
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
+
 from models.schemas import UserAuth
 from models.entities import UserCreate, UserUpdate
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-# ===== 密码工具 =====
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+import util
 
 
 # ===== 创建用户 =====
@@ -23,7 +13,7 @@ def create_user(db: Session, user: UserCreate) -> UserAuth:
     db_user = UserAuth(
         username=user.username,
         email=user.email,
-        password_hash=get_password_hash(user.password)
+        password_hash=util.get_password_hash(user.password)
     )
     db.add(db_user)
     db.commit()
@@ -53,7 +43,7 @@ def update_user(db: Session, user_id: int, user_update: UserUpdate) -> Optional[
     update_data = user_update.dict(exclude_unset=True)
 
     if "password" in update_data and update_data["password"]:
-        db_user.password_hash = get_password_hash(update_data["password"])
+        db_user.password_hash = util.get_password_hash(update_data["password"])
         db_user.password_changed_at = datetime.now(timezone.utc)
         # 重置失败尝试
         db_user.failed_attempts = 0
@@ -78,7 +68,7 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
     if user.is_locked and user.lock_until and user.lock_until > datetime.now(timezone.utc):
         raise Exception("账户已被锁定，请稍后再试")
 
-    if not verify_password(password, user.password_hash):
+    if not util.verify_password(password, user.password_hash):
         # 增加失败次数
         user.failed_attempts += 1
         if user.failed_attempts >= 5:  # 超过5次锁定30分钟
