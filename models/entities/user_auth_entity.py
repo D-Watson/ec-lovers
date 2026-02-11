@@ -1,13 +1,27 @@
 # schemas.py
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional
 
 
 class UserCreate(BaseModel):
-    username: str
+    username: str = Field(
+        default='', min_length=1, max_length=20
+    )
     email: EmailStr
-    password: str
+    password: str = Field(
+        min_length=6, max_length=15
+    )
+
+
+class UserLogin(BaseModel):
+    user_id: str = Field(
+        default='', min_length=1, max_length=100
+    )
+    username: Optional[str] = None
+    password: str = Field(
+        min_length=6, max_length=15
+    )
 
 
 class UserUpdate(BaseModel):
@@ -15,6 +29,17 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
     is_locked: Optional[bool] = None
     mfa_secret: Optional[str] = None
+
+
+class RegisterRes(BaseModel):
+    user_id: int
+    username: str
+
+
+class LoginRes(BaseModel):
+    user_id: int
+    username: str
+    token: str
 
 
 class UserResponse(BaseModel):

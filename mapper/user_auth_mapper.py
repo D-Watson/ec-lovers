@@ -1,28 +1,34 @@
 # crud.py
+import logging
+import uuid
+
 from sqlalchemy.orm import Session
 
+import consts
 from models.schemas import UserAuth
 from models.entities import UserCreate, UserUpdate
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import util
+import db
+
+db = next(db.get_main_db())
 
 
 # ===== 创建用户 =====
-def create_user(db: Session, user: UserCreate) -> UserAuth:
-    db_user = UserAuth(
-        username=user.username,
-        email=user.email,
-        password_hash=util.get_password_hash(user.password)
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+def create_user(user: UserAuth) -> UserAuth:
+    try:
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    except Exception as e:
+        logging.error(f'[db] create user err,{e}')
+        raise consts.ServiceError(consts.ErrorCode.DB_ERR)
+    return user
 
 
 # ===== 查询用户 =====
-def get_user_by_id(db: Session, user_id: int) -> Optional[UserAuth]:
+def get_user_by_id(user_id: str) -> Optional[UserAuth]:
     return db.query(UserAuth).filter(UserAuth.user_id == user_id).first()
 
 
@@ -30,12 +36,12 @@ def get_user_by_username(db: Session, username: str) -> Optional[UserAuth]:
     return db.query(UserAuth).filter(UserAuth.username == username).first()
 
 
-def get_user_by_email(db: Session, email: str) -> Optional[UserAuth]:
+def get_user_by_email(email: str) -> Optional[UserAuth]:
     return db.query(UserAuth).filter(UserAuth.email == email).first()
 
 
 # ===== 更新用户 =====
-def update_user(db: Session, user_id: int, user_update: UserUpdate) -> Optional[UserAuth]:
+def update_user(user_id: int, user_update: UserUpdate) -> Optional[UserAuth]:
     db_user = get_user_by_id(db, user_id)
     if not db_user:
         return None
@@ -59,7 +65,7 @@ def update_user(db: Session, user_id: int, user_update: UserUpdate) -> Optional[
 
 
 # ===== 登录验证 & 失败尝试处理 =====
-def authenticate_user(db: Session, username: str, password: str) -> Optional[UserAuth]:
+def authenticate_user(username: str, password: str) -> Optional[UserAuth]:
     user = get_user_by_username(db, username)
     if not user:
         return None
@@ -89,7 +95,7 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
 
 
 # ===== 注销 MFA / 其他操作 =====
-def disable_mfa(db: Session, user_id: int):
+def disable_mfa(user_id: int):
     user = get_user_by_id(db, user_id)
     if user:
         user.mfa_secret = None
@@ -99,7 +105,7 @@ def disable_mfa(db: Session, user_id: int):
 
 
 # ===== （可选）软删除：通过 is_locked 标记 =====
-def soft_delete_user(db: Session, user_id: int):
+def soft_delete_user(user_id: int):
     user = get_user_by_id(db, user_id)
     if user:
         user.is_locked = True  # 视为“删除”

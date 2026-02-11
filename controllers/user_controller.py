@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Body
 
 import consts
 import models
 import services
+from typing import Annotated
 
 user_router = APIRouter(
     prefix="/user",  # 所有路由自动加前缀 /lovers
@@ -11,11 +12,9 @@ user_router = APIRouter(
 
 
 @user_router.post("/login")
-def login(lover_image: models.LoverAvatarRequest):
+def login(user: Annotated[models.UserLogin, Body(embed=True)]):
     try:
-        res = services.generate_profile(lover_id=lover_image.lover_id,
-                                        user_id=lover_image.user_id,
-                                        prompt=lover_image.prompt)
+        res = services.user_login(user)
         if res is not None:
             return models.SuccessResponse.build(data=res)
     except consts.ServiceError as e:
@@ -24,11 +23,9 @@ def login(lover_image: models.LoverAvatarRequest):
 
 
 @user_router.post("/register")
-def register(lover_image: models.LoverAvatarRequest):
+def register(user: Annotated[models.UserCreate, Body(embed=True)]):
     try:
-        res = services.generate_profile(lover_id=lover_image.lover_id,
-                                        user_id=lover_image.user_id,
-                                        prompt=lover_image.prompt)
+        res = services.user_register(user)
         if res is not None:
             return models.SuccessResponse.build(data=res)
     except consts.ServiceError as e:

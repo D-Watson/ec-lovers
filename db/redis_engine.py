@@ -1,5 +1,5 @@
 import redis
-
+from datetime import timedelta
 import consts
 
 pool = redis.ConnectionPool(
@@ -21,7 +21,7 @@ async def aget(key: str):
 
 
 def set(key: str, value: str, ex: int):
-    r.set(key, value, expire=ex)
+    r.set(key, value, ex=timedelta(days=ex))
 
 
 def get(key: str) -> str:

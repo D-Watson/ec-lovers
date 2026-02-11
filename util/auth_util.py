@@ -1,10 +1,11 @@
 import logging
 
 from passlib.context import CryptContext
-
+from snowflake import SnowflakeGenerator
 from db import set, get
 from jose import jwt
 from datetime import datetime, timedelta
+from consts import ServiceError, ErrorCode
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = "your-super-secret-key-32+chars"  # 至少 32 位
@@ -19,6 +20,12 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
+
+
+def get_uuid() -> int | None:
+    generator = SnowflakeGenerator(42)
+    unique_id = next(generator)
+    return unique_id
 
 
 def get_user_token_key(user_id: str):
@@ -49,8 +56,7 @@ def create_access_token(user_id: str, username: str):
 def save_token(user_id: str, token: str):
     key = get_user_token_key(user_id)
     try:
-        set(key, token, 30*24*3600)
+        set(key, token, 30)
     except Exception as e:
         logging.error(f'[redis] save token err={e}')
-
-
+        raise ServiceError(ErrorCode.REDIS_ERR)

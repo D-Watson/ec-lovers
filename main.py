@@ -15,6 +15,7 @@ app = FastAPI(
 )
 app.include_router(controllers.router)
 app.include_router(controllers.photo)
+app.include_router(controllers.user_router)
 # 添加 CORS 中间件
 app.add_middleware(
     CORSMiddleware,
