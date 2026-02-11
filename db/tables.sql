@@ -83,3 +83,26 @@ CREATE INDEX idx_message_store_session_id ON message_store (session_id);
 CREATE INDEX idx_message_store_created_at ON message_store (created_at);
 -- 联合索引（推荐）：高效获取某会话的最新 N 条消息
 CREATE INDEX idx_message_store_session_time ON message_store (session_id, created_at);
+
+-- 用户认证表
+CREATE TABLE user_auth (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    password_salt VARCHAR(50) NOT NULL DEFAULT '',
+    is_locked BOOLEAN DEFAULT false,
+    failed_attempts INT DEFAULT 0,
+    lock_until TIMESTAMP WITH TIME ZONE,
+    mfa_secret VARCHAR(100),
+    password_changed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT unique_username UNIQUE (username),
+    CONSTRAINT unique_email UNIQUE (email)
+);
+
+-- 密码策略约束
+COMMENT ON COLUMN user_auth.password_hash IS 'BCrypt加密后的密码';
+COMMENT ON COLUMN user_auth.failed_attempts IS '登录失败次数';
+COMMENT ON COLUMN user_auth.lock_until IS '账户锁定到何时';

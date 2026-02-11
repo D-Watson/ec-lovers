@@ -1,9 +1,12 @@
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from starlette.requests import Request
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import controllers
 import uvicorn
+from middlewares import PrometheusMiddleware
+from starlette.responses import Response
 
 app = FastAPI(
     title="My Love App",
@@ -20,12 +23,17 @@ app.add_middleware(
     allow_methods=["*"],  # 允许所有方法（GET, POST, OPTIONS 等）
     allow_headers=["*"],  # 允许所有 headers
 )
-
+app.add_middleware(PrometheusMiddleware)
 
 @app.get("/")
 def root():
     return {"message": "Welcome to Love API!"}
 
+
+@app.get("/metrics")
+def metrics():
+    """暴露 Prometheus 指标"""
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
