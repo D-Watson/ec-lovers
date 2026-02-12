@@ -4,20 +4,28 @@ from datetime import datetime
 from typing import Optional
 
 
+class EmailTokenSendRequest(BaseModel):
+    email: EmailStr
+
+
 class UserCreate(BaseModel):
     username: str = Field(
         default='', min_length=1, max_length=20
     )
     email: EmailStr
+    email_token: str = Field(
+        max_length=6, min_length=6
+    )
     password: str = Field(
         min_length=6, max_length=15
     )
 
 
 class UserLogin(BaseModel):
-    user_id: str = Field(
+    user_id: Optional[str] = Field(
         default='', min_length=1, max_length=100
-    )
+    ) | None
+    email: EmailStr
     username: Optional[str] = None
     password: str = Field(
         min_length=6, max_length=15

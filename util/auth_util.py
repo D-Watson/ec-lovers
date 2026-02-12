@@ -56,7 +56,37 @@ def create_access_token(user_id: str, username: str):
 def save_token(user_id: str, token: str):
     key = get_user_token_key(user_id)
     try:
-        set(key, token, 30)
+        set(key, token, ex_days=30)
     except Exception as e:
         logging.error(f'[redis] save token err={e}')
         raise ServiceError(ErrorCode.REDIS_ERR)
+
+
+def delete_token(user_id: str):
+    key = get_user_token_key(user_id)
+    try:
+        set(key, '', 0)
+    except Exception as e:
+        logging.error(f'[redis] delete token err={e}')
+        raise ServiceError(ErrorCode.REDIS_ERR)
+
+
+def save_email_token(email: str, token: str):
+    key = f'email_token:{email}'
+    try:
+        set(key, token, ex_minutes=5)  # 5分钟过期
+    except Exception as e:
+        logging.error(f'[redis] save email token err={e}')
+        raise ServiceError(ErrorCode.REDIS_ERR)
+
+
+def verify_email_token(email: str, token: str) -> bool:
+    key = f'email_token:{email}'
+    try:
+        rtoken = get(key)
+        if rtoken != token:
+            return False
+    except Exception as e:
+        logging.error(f'[redis] verify email token err={e}')
+        return False
+    return True

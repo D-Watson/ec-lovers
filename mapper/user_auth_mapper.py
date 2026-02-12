@@ -28,6 +28,11 @@ def create_user(user: UserAuth) -> UserAuth:
 
 
 # ===== 查询用户 =====
+
+def get_user_by_email(email: str) -> Optional[UserAuth]:
+    return db.query(UserAuth).filter(UserAuth.email == email).first()
+
+
 def get_user_by_id(user_id: str) -> Optional[UserAuth]:
     return db.query(UserAuth).filter(UserAuth.user_id == user_id).first()
 

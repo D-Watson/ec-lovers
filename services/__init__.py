@@ -4,3 +4,4 @@ from .cos_services import *
 from .image_service import *
 from .message_service import *
 from .user_auth_service import *
+from .email_service import *

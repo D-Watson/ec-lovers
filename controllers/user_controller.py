@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Body
+from fastapi import APIRouter, Body
 
 import consts
 import models
@@ -31,3 +31,10 @@ def register(user: Annotated[models.UserCreate, Body(embed=True)]):
     except consts.ServiceError as e:
         error = models.BaseResponse(code=e.err_code, msg=e.err_msg)
         return error
+
+
+@user_router.post("/send_email_code")
+def send_email_code(email: Annotated[models.EmailTokenSendRequest, Body(embed=True)]):
+    res = services.send_verification_email(email.email)
+    if res is not None:
+        return models.SuccessResponse.build(data=res)

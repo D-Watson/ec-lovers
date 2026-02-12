@@ -8,6 +8,10 @@ from consts import ServiceError, ErrorCode
 
 
 def user_register(user: UserCreate) -> RegisterRes:
+    # 1.验证邮箱验证码
+    if not util.verify_email_token(user.email, user.email_token):
+        raise ServiceError(ErrorCode.EMAIL_TOKEN_ERR)
+    # 2. 生成唯一uid并创建用户实体
     uid = util.get_uuid()
     entity = models.UserAuth(
         user_id=uid,
@@ -15,6 +19,7 @@ def user_register(user: UserCreate) -> RegisterRes:
         email=user.email,
         password_hash=util.get_password_hash(user.password)
     )
+    # 3. 存储用户实体
     try:
         res = mapper.create_user(entity)
         return RegisterRes(
@@ -27,7 +32,9 @@ def user_register(user: UserCreate) -> RegisterRes:
 
 def user_login(user: models.UserLogin) -> LoginRes:
     try:
-        entity = mapper.get_user_by_id(user.user_id)
+        entity = mapper.get_user_by_email(user.email)
+        if not entity:
+            raise ServiceError(ErrorCode.USER_NOT_FOUND)
         passwd_validated = util.verify_password(user.password, entity.password_hash)
         if not passwd_validated:
             raise ServiceError(ErrorCode.PASSWORD_ERR)

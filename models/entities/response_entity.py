@@ -13,6 +13,7 @@ class SuccessResponse(BaseModel, Generic[T]):
     code: int
     msg: str
     data: Optional[T] = None
+
     @classmethod
     def build(cls, data: Optional[T] = None):
         return cls(code=consts.ErrorCode.SUCCESS[0], msg=consts.ErrorCode.SUCCESS[1], data=data)

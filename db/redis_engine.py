@@ -20,8 +20,9 @@ async def aget(key: str):
     return await r.get(key)
 
 
-def set(key: str, value: str, ex: int):
-    r.set(key, value, ex=timedelta(days=ex))
+def set(key: str, value: str, ex_days: int = 0, ex_minutes: int = 0, ex_seconds: int = 0):
+    ex = ex_days * 24 * 3600 + ex_minutes * 60 + ex_seconds
+    r.set(key, value, ex=timedelta(seconds=ex))
 
 
 def get(key: str) -> str:
