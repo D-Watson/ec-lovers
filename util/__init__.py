@@ -1,1 +1,1 @@
-from auth_util import *
+from .auth_util import *

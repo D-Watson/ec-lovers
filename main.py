@@ -13,9 +13,6 @@ app = FastAPI(
     description="情侣互动 API",
     version="1.0.0"
 )
-app.include_router(controllers.router)
-app.include_router(controllers.photo)
-app.include_router(controllers.user_router)
 # 添加 CORS 中间件
 app.add_middleware(
     CORSMiddleware,
@@ -26,6 +23,9 @@ app.add_middleware(
 )
 app.add_middleware(PrometheusMiddleware)
 app.add_middleware(AuthMiddleware)
+app.include_router(controllers.router)
+app.include_router(controllers.photo)
+app.include_router(controllers.user_router)
 
 
 @app.get("/")

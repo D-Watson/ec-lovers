@@ -22,7 +22,10 @@ async def aget(key: str):
 
 def set(key: str, value: str, ex_days: int = 0, ex_minutes: int = 0, ex_seconds: int = 0):
     ex = ex_days * 24 * 3600 + ex_minutes * 60 + ex_seconds
-    r.set(key, value, ex=timedelta(seconds=ex))
+    print(key)
+    print(ex)
+    res = r.set(key, value, ex=timedelta(seconds=ex))
+    print(res)
 
 
 def get(key: str) -> str:

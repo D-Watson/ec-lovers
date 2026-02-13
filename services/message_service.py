@@ -10,6 +10,8 @@ async def get_messages(user_id: str, lover_id: str) -> List[MessageEntity]:
     res = []
     try:
         records = await mapper.get_messages(session_id)
+        if records is None or len(records) == 0:
+            return res
         for record in records:
             res.append(MessageEntity(
                 id=record.id,

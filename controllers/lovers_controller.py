@@ -34,7 +34,7 @@ def create_lover(lover: models.UserLoverCreate):
 
 @router.get("/list", response_model=models.BaseResponse[List[models.UserLover]])
 def list_lovers(
-        user_id: str = Query(..., min_length=1, max_length=20)
+        user_id: str = Query(..., min_length=1, max_length=50)
 ):
     logging.info(f"request userId={user_id}")
     try:
@@ -53,7 +53,7 @@ def list_lovers(
 
 @router.websocket("/chat/{user_id}/{lover_id}")
 async def lover_chat(websocket: WebSocket,
-                     user_id: str = Path(..., min_length=1, max_length=20),
+                     user_id: str = Path(..., min_length=1, max_length=50),
                      lover_id: str = Path(..., pattern=r"^lover-\d+$")
                      ):
     server = services.AIServer(user_id=user_id, lover_id=lover_id)

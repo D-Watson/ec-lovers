@@ -24,7 +24,7 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     user_id: Optional[str] = Field(
         default='', min_length=1, max_length=100
-    ) | None
+    )
     email: EmailStr
     username: Optional[str] = None
     password: str = Field(
@@ -40,18 +40,18 @@ class UserUpdate(BaseModel):
 
 
 class RegisterRes(BaseModel):
-    user_id: int
+    user_id: str
     username: str
 
 
 class LoginRes(BaseModel):
-    user_id: int
+    user_id: str
     username: str
     token: str
 
 
 class UserResponse(BaseModel):
-    user_id: int
+    user_id: str
     username: str
     email: str
     is_locked: bool

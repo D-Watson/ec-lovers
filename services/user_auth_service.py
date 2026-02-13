@@ -9,24 +9,26 @@ from consts import ServiceError, ErrorCode
 
 def user_register(user: UserCreate) -> RegisterRes:
     # 1.验证邮箱验证码
-    if not util.verify_email_token(user.email, user.email_token):
-        raise ServiceError(ErrorCode.EMAIL_TOKEN_ERR)
-    # 2. 生成唯一uid并创建用户实体
-    uid = util.get_uuid()
-    entity = models.UserAuth(
-        user_id=uid,
-        username=user.username,
-        email=user.email,
-        password_hash=util.get_password_hash(user.password)
-    )
-    # 3. 存储用户实体
     try:
+        res = util.verify_email_token(user.email, user.email_token)
+        if not res:
+            raise ServiceError(ErrorCode.EMAIL_TOKEN_ERR)
+        # 2. 生成唯一uid并创建用户实体
+        uid = util.get_uuid(user.email)
+        entity = models.UserAuth(
+            user_id=uid,
+            username=user.username,
+            email=user.email,
+            password_hash=util.get_password_hash(user.password)
+        )
+        # 3. 存储用户实体
         res = mapper.create_user(entity)
         return RegisterRes(
             user_id=res.user_id,
             username=res.username
         )
     except ServiceError as e:
+        logging.error(e)
         raise e
 
 
@@ -47,5 +49,6 @@ def user_login(user: models.UserLogin) -> LoginRes:
         )
     except ServiceError as e:
         logging.error(e)
+        raise e
 
 

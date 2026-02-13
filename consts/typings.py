@@ -17,6 +17,8 @@ class ErrorCode:
     TOKEN_EXPIRED = (2007, "auth token expired.")
 
     # email
+    EMAIL_TOKEN_EXPIRED = (2010, "email token expired.")
+
     EMAIL_TOKEN_ERR = (2009, "email token error.")
 
     # user

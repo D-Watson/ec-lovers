@@ -14,7 +14,7 @@ def generate_code():
 
 
 # 2. 发送邮件
-def send_verification_email(to_email) -> bool:
+def send_verification_email(to_email: str) -> bool:
     validate_code = generate_code()
     # 发件人邮箱 & 授权码（不是登录密码！）
     sender_email = "3833340167@qq.com"

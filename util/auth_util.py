@@ -22,10 +22,8 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def get_uuid() -> int | None:
-    generator = SnowflakeGenerator(42)
-    unique_id = next(generator)
-    return unique_id
+def get_uuid(email) -> str:
+    return f'user:{email}'
 
 
 def get_user_token_key(user_id: str):
@@ -86,7 +84,8 @@ def verify_email_token(email: str, token: str) -> bool:
         rtoken = get(key)
         if rtoken != token:
             return False
-    except Exception as e:
+    except ServiceError as e:
         logging.error(f'[redis] verify email token err={e}')
-        return False
+        raise e
     return True
+

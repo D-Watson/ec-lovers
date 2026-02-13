@@ -12,7 +12,7 @@ user_router = APIRouter(
 
 
 @user_router.post("/login")
-def login(user: Annotated[models.UserLogin, Body(embed=True)]):
+def login(user: models.UserLogin):
     try:
         res = services.user_login(user)
         if res is not None:
@@ -23,7 +23,7 @@ def login(user: Annotated[models.UserLogin, Body(embed=True)]):
 
 
 @user_router.post("/register")
-def register(user: Annotated[models.UserCreate, Body(embed=True)]):
+def register(user: models.UserCreate):
     try:
         res = services.user_register(user)
         if res is not None:
@@ -34,7 +34,7 @@ def register(user: Annotated[models.UserCreate, Body(embed=True)]):
 
 
 @user_router.post("/send_email_code")
-def send_email_code(email: Annotated[models.EmailTokenSendRequest, Body(embed=True)]):
+def send_email_code(email: models.EmailTokenSendRequest):
     res = services.send_verification_email(email.email)
     if res is not None:
         return models.SuccessResponse.build(data=res)
