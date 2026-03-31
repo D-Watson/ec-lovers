@@ -1,5 +1,6 @@
 
 class ErrorCode:
+
     SUCCESS = (200, "success")
     PARAM_ERR = (2000, "param error")
     DB_ERR = (2001, "db error")
@@ -23,6 +24,7 @@ class ErrorCode:
 
     # user
     USER_NOT_FOUND = (3001, "user not found.")
+    IMAGE_DOWNLOAD_ERR = (3002, "download image error.")
 
     @classmethod
     def get_message(cls, code: int) -> str:

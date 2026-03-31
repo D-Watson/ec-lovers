@@ -14,3 +14,4 @@ REQUEST_LATENCY = Histogram(
     "Request latency in seconds",
     ["method", "path"]
 )
+

@@ -1,3 +1,5 @@
+import logging
+
 from models.schemas import BotPrompt
 import db
 
@@ -91,14 +93,10 @@ def activate_prompt_version(prompt_id: int) -> bool:
 
 def delete_prompt(bot_id: str) -> bool:
     try:
-        prompt = session.query(
-            BotPrompt
-        ).filter(
+        count = session.query(BotPrompt).filter(
             BotPrompt.bot_id == bot_id
-        )
-        if not prompt:
-            return False
-        session.delete(prompt)
+        ).delete()
+        logging.info(f"Deleted {count} prompts for bot_id={bot_id}")
         session.commit()
         return True
     finally:

@@ -30,7 +30,7 @@ def lover_list(user_id: str):
 
 def save_prompt(lover: models.UserLover):
     prompt = consts.get_prompt(gender_id=lover.gender,
-                               personality_id=lover.gender,
+                               personality_id=lover.personality,
                                hobbies=lover.hobbies,
                                talking_style=lover.talking_style)
     try:

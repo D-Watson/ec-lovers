@@ -25,7 +25,7 @@ class PostgresChatMessageHistoryAsync(BaseChatMessageHistory):
                     order_by(MessageStore.created_at)
                 )
                 print(records)
-                if records is None:
+                if records is None or records == []:
                     return []
                 messages = []
                 for row in records.scalars():
@@ -75,7 +75,6 @@ async def get_messages(session_id: str) -> List[MessageStore]:
                 order_by(MessageStore.created_at)
             )
             records = result.scalars().all()
-            print(records[0])
             return records
     except Exception as e:
         logging.error(f'[db] get msg error, session={session_id}, e={e}')

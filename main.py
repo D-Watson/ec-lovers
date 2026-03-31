@@ -46,4 +46,4 @@ async def log_requests(request: Request, call_next):
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=8080)
+    uvicorn.run(app, host='192.168.71.53', port=8080)

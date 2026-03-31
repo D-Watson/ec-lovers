@@ -11,11 +11,11 @@ photo = APIRouter(
 
 
 @photo.post("/upload")
-def profile_generator(lover_image: models.LoverAvatarRequest):
+async def profile_generator(lover_image: models.LoverAvatarRequest):
     try:
-        res = services.generate_profile(lover_id=lover_image.lover_id,
-                                        user_id=lover_image.user_id,
-                                        prompt=lover_image.prompt)
+        res = await services.generate_profile(lover_id=lover_image.lover_id,
+                                              user_id=lover_image.user_id,
+                                              prompt=lover_image.prompt)
         if res is not None:
             return models.SuccessResponse.build(data=res)
     except consts.ServiceError as e:
