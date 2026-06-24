@@ -12,16 +12,6 @@ biz_engine = create_engine(
 )
 BizSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=biz_engine)
 
-# === Bot DB 引擎 ===
-bot_engine = create_engine(
-    str(settings.bot_database_url),
-    pool_size=settings.pool_size,
-    max_overflow=settings.max_overflow,
-    echo=False,
-)
-
-BotSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=bot_engine)
-
 # === Message DB 引擎 ===
 msg_engine = create_async_engine(
     str(settings.msg_database_url),
@@ -33,15 +23,6 @@ msg_engine = create_async_engine(
 
 def get_main_db() -> Session:
     db = BizSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-# 依赖注入函数（FastAPI 用）
-def get_bot_db() -> Session:
-    db = BotSessionLocal()
     try:
         yield db
     finally:

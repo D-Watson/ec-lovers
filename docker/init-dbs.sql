@@ -1,4 +1,3 @@
 -- 创建三个业务库
 CREATE DATABASE biz_db;
-CREATE DATABASE bot_db;
 CREATE DATABASE msg_db;

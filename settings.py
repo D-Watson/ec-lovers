@@ -27,17 +27,6 @@ class Settings(BaseSettings):
     def biz_database_url(self) -> str:
         return f"postgresql://{self.biz_db_user}:{self.biz_db_password}@{self.biz_db_host}:{self.biz_db_port}/{self.biz_db_name}"
 
-    # Bot 数据库
-    bot_db_host: str
-    bot_db_port: int = 5432
-    bot_db_user: str
-    bot_db_password: str
-    bot_db_name: str
-
-    @property
-    def bot_database_url(self) -> str:
-        return f"postgresql://{self.bot_db_user}:{self.bot_db_password}@{self.bot_db_host}:{self.bot_db_port}/{self.bot_db_name}"
-
     # Message 数据库
     msg_db_host: str
     msg_db_port: int = 5432
@@ -64,13 +53,6 @@ class Settings(BaseSettings):
         client = CosS3Client(config)
         return client
 
-    HUGGINGFACE_HUB: str
-
-    @property
-    def get_huggingface_conf(self) -> str:
-        hugging = self.HUGGINGFACE_HUB
-        return hugging
-        # 创建单例实例
 
     ARK_API_KEY: str
     ARK_API_URL: str

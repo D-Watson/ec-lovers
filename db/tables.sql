@@ -15,8 +15,8 @@ CREATE TABLE user_lovers (
 
     talking_style SMALLINT NOT NULL,
 
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- 可选：添加业务唯一索引（防止一个用户重复创建同一个恋人）
@@ -72,10 +72,10 @@ CREATE TABLE message_store (
     content TEXT NOT NULL,
 
     -- 可选：额外元数据（如 tool_call_id, name 等）
-    additional_kwargs JSONB DEFAULT '{}',
+    additional_kwargs JSON DEFAULT '{}',
 
     -- 消息创建时间（用于排序和清理）
-    created_at TIMESTAMPTZ NOT NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 关键索引：按 session_id 快速查询 + 按时间排序
@@ -86,11 +86,11 @@ CREATE INDEX idx_message_store_session_time ON message_store (session_id, create
 
 -- 用户认证表
 CREATE TABLE user_auth (
-    user_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
+    user_id TEXT UNIQUE,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    password_salt VARCHAR(50) NOT NULL DEFAULT '',
     is_locked BOOLEAN DEFAULT false,
     failed_attempts INT DEFAULT 0,
     lock_until TIMESTAMP WITH TIME ZONE,

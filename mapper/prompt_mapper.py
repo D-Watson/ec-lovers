@@ -3,7 +3,7 @@ import logging
 from models.schemas import BotPrompt
 import db
 
-session = next(db.get_bot_db())
+session = next(db.get_main_db())
 
 
 def create_bot_prompt(bot_id: str, prompt_text: str, version: int = 1,
