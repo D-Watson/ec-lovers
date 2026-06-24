@@ -8,7 +8,7 @@ import mapper
 import models
 import services
 from models import LoverAvatarRes
-from settings import settings
+from settings import cfg
 from consts import ServiceError, ErrorCode
 
 """
@@ -22,27 +22,23 @@ Returns:
 
 
 def generate_image_with_doubao(prompt: str) -> str:
-    # 获取API密钥
-    api_key, url = settings.get_doubao_conf
-    # 请求头
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
+        "Authorization": f"Bearer {cfg.ARK_API_KEY}"
     }
 
-    # 请求体
     payload = {
-        "model": "doubao-seedream-4-5-251128",
+        "model": cfg.IMAGE_MODEL,
         "prompt": prompt,
         "sequential_image_generation": "disabled",
         "response_format": "url",
-        "size": "2K",
+        "size": cfg.IMAGE_SIZE,
         "stream": False,
         "watermark": True
     }
     try:
         logging.info("🔄 发送请求到豆包API...")
-        response = requests.post(url, headers=headers, json=payload, timeout=60)
+        response = requests.post(cfg.ARK_API_URL, headers=headers, json=payload, timeout=60)
         # 检查响应状态
         if response.status_code == 200:
             result = response.json()

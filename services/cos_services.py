@@ -1,16 +1,13 @@
 # -*- coding=utf-8
 import logging
 from qcloud_cos.cos_exception import CosClientError, CosServiceError
-from settings import settings
+from settings import cfg
 import consts
-
-PROFILE_BUCKET = 'images-1304897416'
-
 
 class CosService(object):
 
     def __init__(self, user_id, lover_id):
-        self.client = settings.get_cos_client
+        self.client = cfg.cos_client
         self.user_id = user_id
         self.lover_id = lover_id
 
@@ -20,7 +17,7 @@ class CosService(object):
         for i in range(0, 3):
             try:
                 response = self.client.upload_file(
-                    Bucket=PROFILE_BUCKET,
+                    Bucket=cfg.COS_BUCKET,
                     Key=file_name,
                     LocalFilePath=path,
                     EnableMD5=False,
@@ -36,7 +33,7 @@ class CosService(object):
         # 生成下载 URL，使用临时密钥签名
         try:
             url = self.client.get_object_url(
-                Bucket=PROFILE_BUCKET,
+                Bucket=cfg.COS_BUCKET,
                 Key=file_name
             )
             return url

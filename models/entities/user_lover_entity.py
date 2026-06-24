@@ -52,3 +52,7 @@ class MessageEntity(BaseModel):
     content: str
     timestamp: datetime
     type: str
+
+
+class ChatRequest(BaseModel):
+    content: str

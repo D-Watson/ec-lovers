@@ -2,17 +2,14 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
 import util
-
-# 定义不需要认证的路由
-PUBLIC_PATHS = ["/metrics", "/user/login", "/user/register", "/user/send_email_code"]
+from settings import cfg
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         if request.method == "OPTIONS":
             return await call_next(request)
-        # 检查是否为公开路径
-        if any(request.url.path.startswith(path) for path in PUBLIC_PATHS):
+        if any(request.url.path.startswith(path) for path in cfg.PUBLIC_PATHS):
             return await call_next(request)
         print("All headers:", dict(request.headers))
         # 获取请求头中的认证信息

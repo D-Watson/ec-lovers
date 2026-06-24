@@ -9,20 +9,20 @@ from langchain_core.tools import BaseTool
 
 import tools
 from mapper import PostgresChatMessageHistoryAsync
+from settings import cfg
 
 
 class PersonalityLoverAgent:
     """DuckDuckGo搜索 + Ollama本地模型的Agent (带敏感词过滤)"""
 
     def __init__(self,
-                 model_name: str = "llama3.1",
-                 temperature: float = 0.7,
-                 max_tokens: int = 1024):
+                 model_name: str = cfg.OLLAMA_MODEL,
+                 temperature: float = cfg.OLLAMA_TEMPERATURE,
+                 max_tokens: int = cfg.OLLAMA_MAX_TOKENS):
 
-        # 1. 初始化 Ollama LLM
         self.llm = OllamaLLM(
             model=model_name,
-            base_url="http://localhost:11434",
+            base_url=cfg.OLLAMA_BASE_URL,
             temperature=temperature,
             num_predict=max_tokens
         )

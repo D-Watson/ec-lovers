@@ -5,7 +5,7 @@ from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from sqlalchemy import select
 
-import db
+from db.postgre_engine import AsyncMsgSessionFactory
 from models.schemas.message_store import MessageStore  # 你的 ORM 模型
 from consts import ServiceError, ErrorCode
 
@@ -15,10 +15,9 @@ class PostgresChatMessageHistoryAsync(BaseChatMessageHistory):
         self.session_id = session_id
 
     async def aget_messages(self) -> List[BaseMessage]:
-        AsyncSessionLocal = db.get_msg_session()
         """异步获取消息"""
         try:
-            async with AsyncSessionLocal() as session:
+            async with AsyncMsgSessionFactory() as session:
                 records = await session.execute(
                     select(MessageStore).
                     where(MessageStore.session_id == self.session_id).
@@ -48,9 +47,8 @@ class PostgresChatMessageHistoryAsync(BaseChatMessageHistory):
 
 async def save_messages(session_id: str, messages: Sequence[BaseMessage]) -> None:
     """异步添加消息"""
-    AsyncSessionLocal = db.get_msg_session()
     try:
-        async with AsyncSessionLocal() as session:
+        async with AsyncMsgSessionFactory() as session:
             async with session.begin():  # 开启事务
                 for msg in messages:
                     msg_type = "human" if isinstance(msg, HumanMessage) else "ai"
@@ -66,9 +64,8 @@ async def save_messages(session_id: str, messages: Sequence[BaseMessage]) -> Non
 
 
 async def get_messages(session_id: str) -> List[MessageStore]:
-    AsyncSessionLocal = db.get_msg_session()
     try:
-        async with AsyncSessionLocal() as session:
+        async with AsyncMsgSessionFactory() as session:
             result = await session.execute(
                 select(MessageStore).
                 where(MessageStore.session_id == session_id).

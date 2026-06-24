@@ -1,14 +1,13 @@
+# SECURITY-REVIEWED: 2026-06-24 | RULES: v2.6.0-draft
 import logging
 
 from models.schemas import BotPrompt
-import db
-
-session = next(db.get_main_db())
+from db.postgre_engine import BizSessionLocal
 
 
 def create_bot_prompt(bot_id: str, prompt_text: str, version: int = 1,
                       description: str = None, tags: list = None) -> BotPrompt:
-    try:
+    with BizSessionLocal() as session:
         new_prompt = BotPrompt(
             bot_id=bot_id,
             prompt_text=prompt_text,
@@ -20,38 +19,25 @@ def create_bot_prompt(bot_id: str, prompt_text: str, version: int = 1,
         session.commit()
         session.refresh(new_prompt)
         return new_prompt
-    finally:
-        session.close()
 
 
-# 获取某个 bot 的当前活跃 prompt
 def get_active_prompt(bot_id: str) -> BotPrompt | None:
-    try:
-        bot_prompt = session.query(BotPrompt).filter_by(bot_id=bot_id).first()
-        return bot_prompt
-    finally:
-        session.close()
+    with BizSessionLocal() as session:
+        return session.query(BotPrompt).filter_by(bot_id=bot_id).first()
 
 
-# 获取某个 bot 的所有版本（按 version 降序）
 def get_all_versions(bot_id: str) -> list[BotPrompt]:
-    try:
+    with BizSessionLocal() as session:
         return session.query(BotPrompt).filter_by(bot_id=bot_id).order_by(BotPrompt.version.desc()).all()
-    finally:
-        session.close()
 
 
-# 根据 ID 获取
 def get_prompt_by_id(prompt_id: int) -> BotPrompt | None:
-    try:
+    with BizSessionLocal() as session:
         return session.get(BotPrompt, prompt_id)
-    finally:
-        session.close()
 
 
-# 简单更新（如 description、tags）
 def update_prompt(prompt_id: int, **kwargs) -> bool:
-    try:
+    with BizSessionLocal() as session:
         prompt = session.get(BotPrompt, prompt_id)
         if not prompt:
             return False
@@ -60,44 +46,35 @@ def update_prompt(prompt_id: int, **kwargs) -> bool:
                 setattr(prompt, key, value)
         session.commit()
         return True
-    finally:
-        session.close()
 
 
-# 推荐：激活一个新版本，并自动停用旧的活跃版本（原子操作）
 def activate_prompt_version(prompt_id: int) -> bool:
-    try:
-        # 先查出该 prompt 的 bot_id
-        prompt = session.get(BotPrompt, prompt_id)
-        if not prompt:
-            return False
+    with BizSessionLocal() as session:
+        try:
+            prompt = session.get(BotPrompt, prompt_id)
+            if not prompt:
+                return False
 
-        bot_id = prompt.bot_id
+            bot_id = prompt.bot_id
 
-        # 停用该 bot 所有当前活跃的 prompt
-        session.query(BotPrompt).filter(
-            BotPrompt.bot_id == bot_id,
-            BotPrompt.is_active == True
-        ).update({"is_active": False})
+            session.query(BotPrompt).filter(
+                BotPrompt.bot_id == bot_id,
+                BotPrompt.is_active == True
+            ).update({"is_active": False})
 
-        # 激活目标 prompt
-        prompt.is_active = True
-        session.commit()
-        return True
-    except Exception as e:
-        session.rollback()
-        raise e
-    finally:
-        session.close()
+            prompt.is_active = True
+            session.commit()
+            return True
+        except Exception as e:
+            session.rollback()
+            raise e
 
 
 def delete_prompt(bot_id: str) -> bool:
-    try:
+    with BizSessionLocal() as session:
         count = session.query(BotPrompt).filter(
             BotPrompt.bot_id == bot_id
         ).delete()
         logging.info(f"Deleted {count} prompts for bot_id={bot_id}")
         session.commit()
         return True
-    finally:
-        session.close()

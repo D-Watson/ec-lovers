@@ -1,15 +1,16 @@
 import logging
 from typing import List
 
-from fastapi import APIRouter, WebSocket, Path, Query
+from fastapi import APIRouter, Query
+from fastapi.responses import StreamingResponse
 
 import models
 import services
 import consts
 
 router = APIRouter(
-    prefix="/lovers",  # 所有路由自动加前缀 /lovers
-    tags=["lovers"]  # 在 Swagger 文档中分组显示
+    prefix="/lovers",
+    tags=["lovers"]
 )
 
 
@@ -51,13 +52,22 @@ def list_lovers(
     )
 
 
-@router.websocket("/chat/{user_id}/{lover_id}")
-async def lover_chat(websocket: WebSocket,
-                     user_id: str = Path(..., min_length=1, max_length=50),
-                     lover_id: str = Path(..., pattern=r"^lover-\d+$")
-                     ):
+@router.post("/chat/{user_id}/{lover_id}")
+async def lover_chat(
+        user_id: str,
+        lover_id: str,
+        body: models.ChatRequest
+):
     server = services.AIServer(user_id=user_id, lover_id=lover_id)
-    await server.chat(websocket)
+    return StreamingResponse(
+        server.sse_chat(body.content),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        }
+    )
 
 
 @router.post("/delete")

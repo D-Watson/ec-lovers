@@ -1,13 +1,15 @@
+# SECURITY-REVIEWED: 2026-06-24 | RULES: v2.6.0-draft
 import redis
 from datetime import timedelta
 import consts
+from settings import cfg
 
 pool = redis.ConnectionPool(
-    host='localhost',
-    port=6379,
-    db=0,
-    decode_responses=True,  # 自动将 bytes 转为 str（避免 b'xxx'）
-    max_connections=20  # 最大连接数
+    host=cfg.REDIS_HOST,
+    port=cfg.REDIS_PORT,
+    db=cfg.REDIS_DB,
+    decode_responses=True,
+    max_connections=cfg.REDIS_MAX_CONNECTIONS
 )
 r = redis.Redis(connection_pool=pool)
 

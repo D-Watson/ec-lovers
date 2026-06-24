@@ -7,19 +7,19 @@ import controllers
 import uvicorn
 from middlewares import PrometheusMiddleware, AuthMiddleware
 from starlette.responses import Response
+from settings import cfg
 
 app = FastAPI(
     title="My Love App",
     description="情侣互动 API",
     version="1.0.0"
 )
-# 添加 CORS 中间件
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 或指定具体前端地址，如 ["http://localhost:3000"]
+    allow_origins=cfg.CORS_ALLOW_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],  # 允许所有方法（GET, POST, OPTIONS 等）
-    allow_headers=["*"],  # 允许所有 headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 app.add_middleware(PrometheusMiddleware)
 app.add_middleware(AuthMiddleware)
@@ -35,7 +35,6 @@ def root():
 
 @app.get("/metrics")
 def metrics():
-    """暴露 Prometheus 指标"""
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
@@ -46,4 +45,4 @@ async def log_requests(request: Request, call_next):
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=8080)
+    uvicorn.run(app, host=cfg.SERVER_HOST, port=cfg.SERVER_PORT)
